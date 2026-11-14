@@ -1,0 +1,30 @@
+{
+  "model": "qwen3:4b",
+  "reasoning": false,
+  "num_predict": 64,
+  "rounds": [],
+  "request": {
+    "model": "qwen3:4b",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply with the single word OK."
+      }
+    ],
+    "stream": false,
+    "options": {
+      "temperature": 0,
+      "num_predict": 64,
+      "num_ctx": 4096
+    },
+    "think": false
+  },
+  "status": 200,
+  "headers": {
+    "content-type": "application/json; charset=utf-8",
+    "date": "Sat, 14 Nov 2026 13:25:46 GMT",
+    "content-length": "634"
+  },
+  "body": "{\"model\":\"qwen3:4b\",\"created_at\":\"2026-11-14T13:25:46.752634Z\",\"message\":{\"role\":\"assistant\",\"content\":\"Hmm, the user just asked me to reply with the single word \\\"OK\\\". That's straightforward. \\n\\nI wonder why they want this though. Maybe they're testing if I follow simple instructions, or perhaps they're in a hurry and need a quick confirmation. Could also be part of a larger interaction they're setting up\"},\"done\":true,\"done_reason\":\"length\",\"total_duration\":21457516458,\"load_duration\":19952542250,\"prompt_eval_count\":17,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":105714000,\"eval_count\":64,\"eval_duration\":1397022000}",
+  "elapsed_seconds": 21.498
+}

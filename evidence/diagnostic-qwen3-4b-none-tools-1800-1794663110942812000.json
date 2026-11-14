@@ -1,0 +1,135 @@
+{
+  "model": "qwen3:4b",
+  "reasoning": null,
+  "num_predict": 1800,
+  "rounds": [
+    {
+      "content": "",
+      "additional_kwargs": {},
+      "response_metadata": {
+        "model": "qwen3:4b",
+        "created_at": "2026-11-14T13:30:18.965076Z",
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 27307606083,
+        "load_duration": 10798869583,
+        "prompt_eval_count": 272,
+        "prompt_eval_duration": 584305000,
+        "eval_count": 600,
+        "eval_duration": 15919287000,
+        "logprobs": null,
+        "model_name": "qwen3:4b",
+        "model_provider": "ollama"
+      },
+      "type": "ai",
+      "name": null,
+      "id": "lc_run--01a1da40-0725-77ef-bbd2-f962a21c16c1-0",
+      "tool_calls": [
+        {
+          "name": "lookup_records",
+          "args": {
+            "case_id": "A"
+          },
+          "id": "7d406d47-f0a9-4d88-b186-3a3a46fa2ade",
+          "type": "tool_call"
+        },
+        {
+          "name": "lookup_policy",
+          "args": {
+            "case_id": "A"
+          },
+          "id": "9165ea98-157c-4141-b580-10c24acbc757",
+          "type": "tool_call"
+        }
+      ],
+      "invalid_tool_calls": [],
+      "usage_metadata": {
+        "input_tokens": 272,
+        "output_tokens": 600,
+        "total_tokens": 872
+      }
+    },
+    {
+      "content": "{\n  \"case_id\": \"A\",\n  \"action\": \"investigate\",\n  \"refund_allowed\": false\n}",
+      "additional_kwargs": {},
+      "response_metadata": {
+        "model": "qwen3:4b",
+        "created_at": "2026-11-14T13:31:50.941907Z",
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 91947124917,
+        "load_duration": 85346976042,
+        "prompt_eval_count": 376,
+        "prompt_eval_duration": 765900000,
+        "eval_count": 206,
+        "eval_duration": 5831060000,
+        "logprobs": null,
+        "model_name": "qwen3:4b",
+        "model_provider": "ollama"
+      },
+      "type": "ai",
+      "name": null,
+      "id": "lc_run--01a1da40-71d7-71e3-9e04-0ad708caeada-0",
+      "tool_calls": [],
+      "invalid_tool_calls": [],
+      "usage_metadata": {
+        "input_tokens": 376,
+        "output_tokens": 206,
+        "total_tokens": 582
+      }
+    }
+  ],
+  "client_params": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Call lookup_records and lookup_policy for the requested case before deciding. The action must be \"investigate\" when receipt_denied is true and days_since_delivery <= investigate_within_days; otherwise action must be \"no_action\". Copy refund_allowed from policy independently of the action. After BOTH results, output only a JSON object with case_id (string), action (string), refund_allowed (boolean). Derive all values from the tool results.",
+        "images": []
+      },
+      {
+        "role": "user",
+        "content": "Check case A. Use both tools now.",
+        "images": []
+      }
+    ],
+    "stream": true,
+    "model": "qwen3:4b",
+    "think": null,
+    "format": null,
+    "logprobs": null,
+    "top_logprobs": null,
+    "options": {
+      "num_ctx": 4096,
+      "num_predict": 1800,
+      "temperature": 0.0
+    },
+    "keep_alive": null
+  },
+  "executed_tools": [
+    {
+      "name": "lookup_records",
+      "args": {
+        "case_id": "A"
+      },
+      "result": {
+        "case_id": "A",
+        "days_since_delivery": 3,
+        "receipt_denied": true
+      }
+    },
+    {
+      "name": "lookup_policy",
+      "args": {
+        "case_id": "A"
+      },
+      "result": {
+        "case_id": "A",
+        "investigate_within_days": 7,
+        "refund_allowed": false
+      }
+    }
+  ],
+  "valid_json": true,
+  "success": true,
+  "elapsed_seconds": 119.357
+}
