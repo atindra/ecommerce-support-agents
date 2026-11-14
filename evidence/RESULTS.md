@@ -1,75 +1,25 @@
 # Results And Evidence
 
-Historical installation/live logs use `<project-directory>` in place of original local filesystem paths. Recorded results and timings are unchanged.
-
 ## Current Results (2026-11-14)
 
-This section supersedes the historical measurements below wherever they differ. Earlier logs are preserved; the A-D model JSON and current screenshot files were refreshed from final code.
+Start here for evidence of the final verified implementation. These are recorded runs, not new verification of subsequent documentation edits. They supersede the [historical measurements](#historical-verification-superseded) wherever they differ. Early diagnostics and older logs remain supplementary; no evidence files have been moved or removed.
 
 | Check | Actual result | Evidence / boundary |
 |---|---|---|
 | Latest offline suite | 275 passed, 4 live tests deselected in 2.45s | [Offline verification log](verification-offline-test-results.txt); includes the stable saved-C replay |
-| Real Ollama/LangChain A-D | 4 integration tests passed; A/B/D match, C fails support | [Completed batch](final-live-test-results.txt), `llm_qwen3-4b_{A,B,C,D}.json`; passing integration is not four correct decisions |
-| Browser UI | Separate real A-D inference; A-D offline desktop and A mobile captures | `final-ui-{A,B,C,D}-comparison.jsonl`, `scenario_{A,B,C,D}_live.png`; not exhaustive platform testing |
-| Learning | Browser-captured initial / first failure / second failure switch; reload/reset also tested | `learning_A_stage_{0,1,2}.{png,jsonl}`; LLM disabled and original absent runtime state restored |
+| Fresh-package verification | 275 passed, 4 deselected in 15.54s; classical runner succeeded | [Package test log](package-offline-test-results.txt), [verification scope](#clean-package-verification); fresh venv on the same machine |
+| Real Ollama/LangChain A-D | 4 integration tests passed; A/B/D match, C fails support | [Completed batch](final-live-test-results.txt); tool traces: [A](llm_qwen3-4b_A.json), [B](llm_qwen3-4b_B.json), [C (warning)](llm_qwen3-4b_C.json), [D](llm_qwen3-4b_D.json) |
+| Live UI screenshots | Separate real A-D inference | [A](scenario_A_live.png), [B](scenario_B_live.png), [C (warning)](scenario_C_live.png), [D](scenario_D_live.png); not replays of pytest results |
+| Six-agent UI exports | Decisions, reasons, and full traces from those UI runs | [A](final-ui-A-comparison.jsonl), [B](final-ui-B-comparison.jsonl), [C](final-ui-C-comparison.jsonl), [D](final-ui-D-comparison.jsonl) |
+| Classical agents | 20 seed-based results; Simple Reflex misses B | [Comparison](#classical-a-d-comparison), [raw results](classical-results.jsonl), [mechanisms and source](../README.md#five-mechanisms) |
+| Learning | Initial / first failure / second failure switch; reload/reset also tested | [Demonstration](#learning-demonstration); three screenshots and matching exports, with LLM disabled |
+| Offline UI | A-D desktop comparisons and A mobile capture | [Screenshot scope](#screenshot-scope); not exhaustive platform testing |
 
-- [Earlier final offline log](final-offline-test-results.txt): **274 passed, 4 deselected in 3.53s**. Includes immediate feedback display/reset, mechanism explanation/weight-sensitivity UI, action-policy compatibility, uncited declared policy, and irrelevant-record regression checks. An initial run exposed two fake answers citing unrelated `order_status` for refund/tracking; those test inputs now cite relevant facts rather than weakening the checks.
-- [Earlier documentation-check log](submission-offline-test-results.txt): **274 passed, 4 deselected in 2.57s**, the offline suite re-run after the six-agent README summary was added. Superseded by the 275-test result above.
-- [Final live batch log](final-live-test-results.txt): **4 passed, 64 deselected in 243.14s**, one completed sequential A-D run using original `qwen3:4b` and the existing shared service without restarting/reconfiguring it.
-
-| Case | Raw action | Status | Latency seconds | Support/fixture |
-|---|---|---|---:|---|
-| A | delivery_investigation | ok | 45.712 | Supported / match |
-| B | payments_escalation | ok | 129.840 | Supported / match |
-| C | explain_refund_pending | warning | 37.757 | Ineligible / mismatch |
-| D | share_tracking | ok | 29.633 | Supported / match |
-
-All four final traces (`llm_qwen3-4b_A.json` through D) contain both successful model-initiated tools, returned evidence, typed citations, two rounds and zero repairs. Integration passing does not imply correctness: **C still fails policy support**, with the unmodified model action preserved. This is 3/4 fixture agreement, not accuracy.
-
-Browser verification used separately owned Streamlit instances on port 18517 and existing Chrome via optional Playwright. [Live A screenshot](scenario_A_live.png) and [downloaded six-agent result](final-ui-A-comparison.jsonl) retain the genuine A run. B/C/D each have one separate live UI run, distinct from the live pytest batch; the shared Ollama service was not modified:
-
-| New UI case | Raw action / status | Latency seconds | Evidence |
-|---|---|---:|---|
-| B | `payments_escalation` / `ok` | 58.949 | [Screenshot](scenario_B_live.png), [six-agent export](final-ui-B-comparison.jsonl) |
-| C | `explain_refund_pending` / **`warning`** | 33.150 | [Screenshot](scenario_C_live.png), [six-agent export](final-ui-C-comparison.jsonl) |
-| D | `share_tracking` / `ok` | 25.926 | [Screenshot](scenario_D_live.png), [six-agent export](final-ui-D-comparison.jsonl) |
-
-All three used both actual tools, complete retrieval, typed citations, two rounds and zero repairs. Actions/statuses agree with the earlier pytest batch; timings differ. C again fails eligibility/support despite successful execution and valid references. No output was selected for being more favorable, and no retry was made. Screenshots focus on the expanded LLM outcome; downloads preserve all six rows and full traces.
-
-The offline learning sequence used actual feedback buttons, rerunning comparison between clicks without LLM calls: [seed](learning_A_stage_0.png), [one failure](learning_A_stage_1.png), [two failures / review](learning_A_stage_2.png). Corresponding `learning_A_stage_{0,1,2}.jsonl` downloads preserve full-precision counts and estimates. Investigation falls from 7/11 to 7/12 to 7/13, below review's 6/11 only after the second failure. The original absent runtime state was restored. Screenshots retain their original resolution and results; blank bottom space is cropped and the personal-path caption uses a neutral grey mask.
-
-Desktop A-D offline images remain current; [expanded utility/learning details](mechanisms_A_offline.png) show mechanism information. [Mobile A comparison](scenario_A_mobile_offline.png) uses 390x844 with the sidebar closed. Wide tables require horizontal scrolling; this is limited rendering verification, not exhaustive mobile usability testing.
-
-For optional browser capture, install Playwright in a separate tools environment if not already available (`python3.13 -m venv ../capture-tools`, then `../capture-tools/bin/python -m pip install playwright`); installed Google Chrome is also required. Run Streamlit in its application environment, then `../capture-tools/bin/python capture_screenshots.py --url http://127.0.0.1:18517 --skip-offline --live --live-cases B C D --learning`. Use a new evidence copy to avoid overwriting existing captures. Omit `--live` for no model calls. The script never replays saved evidence; `--learning` temporarily resets counts and restores original state. Do not use it concurrently with another feedback writer.
-
-Support now distinguishes action eligibility from declared-policy/citation relevance. Its checks are intentionally bounded: relevant fields and compatible policy do not prove every rationale claim or every prerequisite is explicitly cited. No policy changes, scenario-specific prompt tuning, or automatic action correction were introduced. Windows and fresh-machine validation remain unverified.
-
-### Clean Package Verification
-
-The submission ZIP was extracted into a new directory, a fresh Python 3.13.5 venv was created without system site packages, and dependencies were installed from the extracted `requirements.txt`. The complete offline suite passed **275 passed, 4 deselected in 15.54s** ([log](package-offline-test-results.txt)). `python run_classical.py` also succeeded. Archive CRC/integrity, local Markdown targets and anchors, live/offline A-D images and exports, all three learning stages, and absence of personal absolute paths and runtime feedback were checked. This is same-machine fresh-environment verification, not fresh-machine/Windows testing or new live inference.
-
-Packaging excludes environments, caches, bytecode, runtime feedback, and backups. Useful failure records, linked diagnostics (including `ollama-diagnosis.md` and its JSON probes), and historical test logs are retained. The diagnosis's external runtime-log line references are historical observations; their full server log is not bundled. Personal project paths in the final live log were replaced with `<project-directory>` without changing measurements.
-
-## Historical Verification (Superseded)
-
-The following details preserve earlier development/test history from **2026-11-14**, not current-run claims. All A-D cases evaluate simulated records as of **2026-11-13**. Setup, architecture, mechanisms, policy precedence, and commands are in [README.md](../README.md).
-
-## Summary
-
-| Evidence class | Observed result | Boundary |
-|---|---|---|
-| Offline suite | `270 passed, 4 deselected in 2.35s` | Deterministic tests and substitutes do not establish real-model reliability. |
-| Fresh venv | Pinned requirements installed in Python 3.13.5 `.venv-verify`; `270 passed, 4 deselected in 13.50s` | Same machine, not a fresh-machine or Windows verification. |
-| Classical comparison | 20 results, five agents across A-D, seeded learning history | Simple Reflex misses B's overdue refund; raw pending action remains a warning. |
-| Real local model | A-D each completed both tools and typed cited final JSON | A/B/D match targets; C recommends an ineligible pending-refund explanation with warning. |
-| Earlier live pytest logs | A-C passed sequentially before batch cutoff; D passed separately | Superseded by the completed final batch above; C's pass tests integration, not correctness. |
-| Earlier UI coverage | Offline A-D desktop and limited mobile captures | Superseded by refreshed desktop/mobile images and real live A UI evidence above. |
-
-Environment used: **macOS, Apple M1 Max, 32 GB RAM, Python 3.13.5, Ollama 0.40.16**. Live logs identify Darwin, pytest 9.2.0, and the project's Python environment. A fresh `.venv-verify` was verified on this same machine; no Windows rerun or clean-machine setup validation is claimed. Direct dependency pins are recorded in `requirements.txt`.
+Read the [LLM evaluation](#real-llm-evaluation) for C's unsupported recommendation and the [limitations](#limitations) for remaining gaps. Integration passing is not recommendation correctness.
 
 ## Classical A-D Comparison
 
-Source: [classical-results.jsonl](classical-results.jsonl), produced by `python run_classical.py`. That script explicitly uses `learning.seed_counts()` and prints validated raw results without writing runtime history. Entries include the action, rationale, citations, issues, and detailed mechanism trace.
+Source: [classical-results.jsonl](classical-results.jsonl), produced by `python run_classical.py`. The script uses `learning.seed_counts()` without reading adapted history or writing feedback. Entries preserve actions, rationales, citations, issues, and mechanism traces.
 
 | Agent | A | B | C | D |
 |---|---|---|---|---|
@@ -80,45 +30,75 @@ Source: [classical-results.jsonl](classical-results.jsonl), produced by `python 
 | Utility-Based | `delivery_investigation`, ok | `payments_escalation`, ok | `request_clarification`, ok | `share_tracking`, ok |
 | Learning, seeded | `delivery_investigation`, ok | `payments_escalation`, ok | `request_clarification`, ok | `share_tracking`, ok |
 
-Simple Reflex selects B's current `pending` label without computing an SLA. The evaluator adds `Raw action explain_refund_pending is ineligible for the supplied evidence.` It does not rewrite the action. B's actual return date is Oct 29, passed inspection date Oct 30, and five-business-day deadline Nov 6; pending on Nov 13 warrants escalation under the assumed policy.
+Simple Reflex reads B's current `pending` label without SLA arithmetic. With return Oct 29, passed inspection Oct 30, and a five-business-day deadline of Nov 6, pending on Nov 13 warrants escalation. Validation retains the raw answer and adds `Raw action explain_refund_pending is ineligible for the supplied evidence.`
 
-Model-Based Reflex exposes dated belief transitions followed by snapshot reconciliation, conflict records, and derived dates. Goal-Based exposes intent-derived search, prerequisites/effects, explored states, and blocked operators. Its saved plans have lengths A=3, B=5, C=2, D=4; C's requested refund goal is unreachable and its fallback is `request_clarification -> communicate_review_addressed`. These steps identify a support workflow, not completed real operations.
+The [README explains each mechanism](../README.md#five-mechanisms); the raw results show belief transitions, BFS operators/plans, utility contributions, and learning estimates. Saved goal plans have lengths A=3, B=5, C=2, D=4; C's requested refund goal is unreachable and falls back to clarification. Utility scores are A=0.2525, B=0.2775, C=0.1025, D=0.2925 under the documented synthetic weights. Shared eligibility limits candidates but does not select a common answer.
 
-Utility-Based exposes eligible candidate features, contributions, exclusions, and rankings. Its selected scores are A=0.2525, B=0.2775, C=0.1025, D=0.2925 under synthetic weights `(impact, delay, effort, error risk) = (0.40, 0.25, 0.10, 0.25)`. Learning exposes counts, smoothed rates, exclusions, and deterministic tie preference. Shared eligibility limits candidates but is not a shared answer-selection function.
+## Real LLM Evaluation
 
-## Historical Local LLM Runs
+The [final live batch](final-live-test-results.txt) records **4 passed, 64 deselected in 243.14s**, one completed sequential A-D run using original `qwen3:4b`. Each trace contains both successful model-initiated tools, returned evidence, typed citations, two invocation rounds, and zero repairs.
 
-The tested tag was the **original `qwen3:4b`**, not a custom tag or a smaller fallback. This table retains earlier measurements; the similarly named JSON files were replaced by the current runs listed at the top. Do not use the linked current JSON to substantiate these older timestamps or latencies. The partial/separate terminal logs below preserve the earlier execution history.
+| Case | Raw action | Status | Latency seconds | Support/fixture |
+|---|---|---|---:|---|
+| A | delivery_investigation | ok | 45.712 | Supported / match |
+| B | payments_escalation | ok | 129.840 | Supported / match |
+| C | explain_refund_pending | warning | 37.757 | Ineligible / mismatch |
+| D | share_tracking | ok | 29.633 | Supported / match |
 
-| Case / artifact | Captured At (UTC, 2026-11-14) | Raw action | Status | Latency (s) | Fixture match |
-|---|---|---|---|---:|---|
-| [A](llm_qwen3-4b_A.json) | 13:39:32.393595 | `delivery_investigation` | `ok` | 203.345 | Yes |
-| [B](llm_qwen3-4b_B.json) | 13:41:57.272488 | `payments_escalation` | `ok` | 144.875 | Yes |
-| [C](llm_qwen3-4b_C.json) | 13:45:19.173158 | `explain_refund_pending` | **`warning`** | 201.897 | **No** |
-| [D](llm_qwen3-4b_D.json) | 13:47:20.502098 | `share_tracking` | `ok` | 58.074 | Yes |
+**Why C fails:** `refund_status` exists but is `unknown`, and the claimed return and passed inspection are unverified. A valid citation therefore does not support explaining a pending refund; clarification/review is required. The adapter keeps the model's raw action and flags it as a warning, without classical substitution or support-driven repair. The live test accepts `ok` or `warning` while requiring both tools and typed citations. Thus this is **3/4 fixture agreement, not accuracy** or a reliability estimate.
 
-Every completed case records exactly these successful, selected-case calls: `lookup_case_records({"case_id":"<case>"})` and `lookup_support_policy({"case_id":"<case>"})`. Both outputs were sent back through tool messages. Each has `retrieval_complete: true`, two invocation rounds, zero repair attempts, and a final typed citation set spanning both tools.
+Execution, reference validity, and policy support are separate checks; see [LLM Output And Limits](../README.md#llm-output-and-limits). Compatible policy and relevant fields do not prove every rationale claim or explicitly cite every prerequisite. The saved-C offline regression preserves this distinction through the real adapter with substitute model messages.
 
-| Case | Cited records fields | Cited policy / policy ID | Support check and interpretation |
-|---|---|---|---|
-| A | `order_status` | `DNR` | `support_valid: true`; delivered Nov 10 and denial of receipt at Nov 13 support investigation within seven days; proof is optional. The citation itself is narrower than all the facts needed for this conclusion. |
-| B | `refund_status`, `inspection_date` | `REFUND` | `support_valid: true`; pending, corroborated return/passed inspection, and deadline Nov 6 support escalation. Rationale states that deadline. |
-| C | `refund_status` | `REFUND` | **`support_valid: false`**; field exists but its value is `"unknown"`, not pending. Missing return and passed inspection require `VERIFY` clarification/review. |
-| D | `tracking` | `TRACK` | `support_valid: true`; recorded in-transit tracking and Nov 16 expected date support sharing tracking, not inventing delay. |
+### Separate Live UI Runs
 
-C's exact public rationale is **`Refund status unknown; inspection pending verification`**. Its raw action is still **`explain_refund_pending`**, with issue **`Raw action explain_refund_pending is ineligible for the supplied evidence.`** The correct next step under this simulation is clarification/review because the claimed return is unsupported, inspection is unknown, and refund status is unknown. A syntactically valid citation to `refund_status` does not prove a pending refund. There was **no forced correction**, classical substitution, or support-driven repair. All four structured outputs passed the schema/basic citation stage; only three passed action eligibility and matched their fixture targets.
+Browser verification used separately owned Streamlit instances on port 18517 and Chrome via optional Playwright, without modifying the shared Ollama service. [A's screenshot](scenario_A_live.png) and [six-agent export](final-ui-A-comparison.jsonl) retain its genuine run. The other UI measurements are:
 
-This is **3/4 fixture agreement**, not an accuracy estimate or a safety/reliability result. Four authored examples and single captured completions do not establish performance on a population of support requests.
+| UI case | Raw action / status | Latency seconds | Evidence |
+|---|---|---:|---|
+| B | `payments_escalation` / `ok` | 58.949 | [Screenshot](scenario_B_live.png), [six-agent export](final-ui-B-comparison.jsonl) |
+| C | `explain_refund_pending` / **`warning`** | 33.150 | [Screenshot](scenario_C_live.png), [six-agent export](final-ui-C-comparison.jsonl) |
+| D | `share_tracking` / `ok` | 25.926 | [Screenshot](scenario_D_live.png), [six-agent export](final-ui-D-comparison.jsonl) |
 
-### Live Log Boundary
+These B/C/D runs used both tools, complete retrieval, typed citations, two rounds, and zero repairs. Their outcomes agree with the pytest batch, including C's failure, but their timings belong to separate runs. No favorable-output selection or retry was made. Screenshots focus on expanded LLM outcomes; downloads preserve all six rows and full traces.
 
-[live-test-results.txt](live-test-results.txt) is the earlier partial sequential A-D invocation of `tests/test_llm.py` with `-m live`. It records A, B, and C as passed and ends at D's test heading. The external command harness stopped the batch at **600 seconds**; this is not proof that D failed an assertion. D was rerun separately: [live-D-test-results.txt](live-D-test-results.txt) records **`1 passed in 58.46s`**. The completed final batch above supersedes this partial run.
+## Learning Demonstration
 
-The live test intentionally accepts `ok` **or** `warning` while requiring an action, both actual tools, retrieval completion, and typed citations from both tools. Thus C passed integration while failing the support/fixture comparison. The earlier partial logs are not one uninterrupted four-case pass; the final log is a completed batch, still not four correct answers.
+The browser sequence used actual feedback buttons and a new comparison between clicks, without LLM calls. Initial counts are synthetic: all eight actions in each of nine fixed contexts start at 0/0, except A's investigation at 6/3 and review at 5/4. B/C/D use neutral estimates and deterministic ties, not fabricated successful experience.
 
-### Runtime And Thinking Diagnosis
+| Explicit A feedback state | Investigation counts | Investigation estimate | Review estimate | Selection | Evidence |
+|---|---|---|---|---|---|
+| Seed | 6/3 | `7/11` | `6/11` (counts 5/4) | Investigation | [Screenshot](learning_A_stage_0.png), [export](learning_A_stage_0.jsonl) |
+| First failure | 6/4 | `7/12` | `6/11` | Investigation | [Screenshot](learning_A_stage_1.png), [export](learning_A_stage_1.jsonl) |
+| Second failure | 6/5 | `7/13` | `6/11` | Human review | [Screenshot](learning_A_stage_2.png), [export](learning_A_stage_2.jsonl) |
 
-Current full-adapter settings in every A-D JSON and `agents/llm.py`:
+Exports preserve full-precision counts and estimates. Feedback persists to `runtime/learning_counts.json`; absent history uses seeds without writing, ordinary reruns do not duplicate outcomes, and reset restores seeds. Adaptation/reload/reset and the two-feedback UI sequence are tested with temporary files. Follow the [README learning example](../README.md#learning-example) to reproduce it.
+
+The original absent runtime state was restored after capture. Screenshot results are unchanged; blank bottom space was cropped and the personal-path caption masked in neutral grey.
+
+## Screenshot Scope
+
+| File | What it documents |
+|---|---|
+| [scenario_A_offline.png](scenario_A_offline.png) | Desktop A comparison; five classical recommendations; LLM `not_run` |
+| [scenario_B_offline.png](scenario_B_offline.png) | Desktop B comparison, including the reflex limitation |
+| [scenario_C_offline.png](scenario_C_offline.png) | Desktop C offline comparison |
+| [scenario_D_offline.png](scenario_D_offline.png) | Desktop D offline comparison |
+| [mechanisms_A_offline.png](mechanisms_A_offline.png) | Expanded utility/learning details |
+| [scenario_A_mobile_offline.png](scenario_A_mobile_offline.png) | A comparison at 390x844, sidebar closed; wide tables scroll horizontally |
+
+Live screenshots and learning stages are linked above. This is limited rendering verification, not exhaustive mobile usability testing. The [initial mobile page](mobile_initial.png) is a historical capture with no comparison run.
+
+For optional capture, install Playwright in a separate tools environment (`python3.13 -m venv ../capture-tools`, then `../capture-tools/bin/python -m pip install playwright`); installed Chrome is required. Run Streamlit in its application environment, then `../capture-tools/bin/python capture_screenshots.py --url http://127.0.0.1:18517 --skip-offline --live --live-cases B C D --learning`. Use a new evidence copy to avoid overwriting captures. Omit `--live` for no model calls. The script does not replay evidence; `--learning` temporarily resets and restores history. Do not run it concurrently with another feedback writer.
+
+## Clean Package Verification
+
+The recorded submission ZIP was extracted into a new directory and dependencies installed from its `requirements.txt` in a fresh Python 3.13.5 venv without system site packages. Offline tests passed **275 passed, 4 deselected in 15.54s** ([log](package-offline-test-results.txt)); `python run_classical.py` also succeeded.
+
+Checks covered archive CRC/integrity, local Markdown targets and anchors, A-D images/exports, all three learning stages, and absence of personal absolute paths and runtime feedback. Packaging excluded environments, caches, bytecode, runtime history, and backups. This verifies the recorded package on the same machine, not a later ZIP rebuild, fresh-machine/Windows setup, or new inference.
+
+## Runtime Settings
+
+Recorded environment: **macOS, Apple M1 Max, 32 GB RAM, Python 3.13.5, Ollama 0.40.16**, original `qwen3:4b` tag (Qwen3 4B Thinking 2507). Dependencies are pinned in [requirements.txt](../requirements.txt). Full-adapter settings in the A-D traces and [agents/llm.py](../agents/llm.py):
 
 ```text
 model=qwen3:4b
@@ -131,48 +111,59 @@ client_kwargs={timeout: 180, trust_env: False}
 max_rounds=6
 ```
 
-The timeout is per client request, not a 180-second cap on the whole multi-round case. Case A/C totals over 180 seconds are therefore not contradictory. Shared-server loading/queue contention contributed substantially to the captured durations; these are not isolated generation-speed benchmarks. No automatic fallback model or fallback classical answer was used.
-
-[ollama-diagnosis.md](ollama-diagnosis.md) records that the installed original tag identifies as **Qwen3 4B Thinking 2507**, `general.finetune=Thinking`, with thinking-only metadata. A `think=false` short probe returned reasoning prose and hit its length limit despite HTTP 200; another `reasoning=False` tools probe timed out, which alone cannot prove eventual tool behavior. The custom tag's edited Go template was not the selected template. No custom model/template was needed for the demonstrated original-tag path.
-
-The diagnostic's working configuration used `reasoning=None`, 1800 tokens, context 4096, and timeout 100 with `trust_env=False`. Its passing two-tool evidence is `diagnostic-qwen3-4b-none-tools-1800-1794663110942812000.json`. Those diagnostic settings and smaller final schema differ from the current 2400/8192/180 full adapter. The historical [smoke_qwen3-4b.json](smoke_qwen3-4b.json) is marked as initial minimal integration with a smaller contract. Private reasoning was removed; its wrong public recommendation (no refund rather than the required investigation) is retained. It is not evidence that the final adapter or live UI worked at that stage. Neither historical artifact supersedes the current A-D traces.
-
-## Offline Verification And Learning
-
-[offline-test-results.txt](offline-test-results.txt) contains **`270 passed, 4 deselected in 2.35s`**, with no expected failures reported. Reproduce separately from real inference with `python -m pytest -m "not live" -q`.
-
-A fresh Python **3.13.5** `.venv-verify` (without system site packages) installed the pinned `requirements.txt`; [fresh-install.txt](fresh-install.txt) records successful installation. [fresh-test-results.txt](fresh-test-results.txt) records **`270 passed, 4 deselected in 13.50s`** in that environment. This verifies a fresh venv on the same macOS machine, not a new machine, Windows, or fresh live inference.
-
-Tests cover immutable/isolation contracts, supplied-case/tool parity, business-day Friday/Saturday/Monday semantics, DNR boundaries and proof, missing/future/conflicting evidence, history regressions, distinct belief transitions, BFS reachability/minimum paths, weight-sensitive utility, eligible learning rankings, malformed/unknown/wrong-case/error tool calls, output/citation validation, bounded repair/exhaustion, unavailable Ollama, session invalidation, and feedback behavior. Fake LLM clients verify control flow; they are not real model evidence.
-
-The learner's nine fixed contexts each initialize **all eight actions to 0 successes / 0 failures**, except `timely_nonreceipt|delivery_investigation` at **6/3** and `timely_nonreceipt|human_review` at **5/4**. These two nonzero entries are synthetic demo outcomes. B/C/D start with neutral eligible estimates and use declared tie-breaking, not fabricated successful experience.
-
-| Explicit A feedback state | Investigation counts | Investigation smoothed estimate | Review estimate | Selected action |
-|---|---|---|---|---|
-| Seed | 6 successes, 3 failures | `7/11` | `6/11` (5 successes, 4 failures) | `delivery_investigation` |
-| One failure, rerun | 6 successes, 4 failures | `7/12` | `6/11` | `delivery_investigation` |
-| Second failure, rerun | 6 successes, 5 failures | `7/13` | `6/11` | `human_review` |
-
-The adaptation/reload/reset test and Streamlit two-feedback test exercise that switch using temporary files. Actual app feedback persists to **`runtime/learning_counts.json`**; absent history uses the seed without writing, explicit feedback/reset creates or updates the file, and reruns do not duplicate outcomes. The three-stage browser sequence is documented above. These are simulated explicit outcomes, not real customer outcomes. No runtime history file is required for the saved seed-based classical comparison.
-
-## Screenshot Scope
-
-| File | What it documents |
-|---|---|
-| [scenario_A_offline.png](scenario_A_offline.png) | Desktop A comparison; five classical recommendations; LLM `not_run` |
-| [scenario_B_offline.png](scenario_B_offline.png) | Desktop B offline comparison, including the reflex limitation |
-| [scenario_C_offline.png](scenario_C_offline.png) | Desktop C offline comparison |
-| [scenario_D_offline.png](scenario_D_offline.png) | Desktop D offline comparison |
-| [mobile_initial.png](mobile_initial.png) | New separate browser context at 390x844; initial A page, collapsed sidebar, no comparison run |
-
-See Current Results for expanded mechanism details, real live A-D inference, the mobile A comparison, and browser feedback progression.
+The timeout is per request, not a whole-case deadline. Shared-server loading/queue contention affected timings; they are not isolated generation-speed benchmarks. There is no automatic model or classical-answer fallback. Earlier runtime investigations are [supplementary diagnostics](#runtime-and-thinking-diagnosis).
 
 ## Limitations
 
-- Authored structured claims drive classical reasoning; raw customer text does not imply an implemented general NLP parser.
-- Policies, utility estimates, and initial learning outcomes are synthetic assumptions, not empirical commerce policy or calibrated probabilities. Public holidays are not modeled.
-- Tool execution and basic citation checks establish transport/reference validity, not semantic entailment. C remains a concrete counterexample to treating clean citations as proof of a supported answer.
-- A shared frozen case provides common available evidence, not identical processing. Learning also consumes disclosed history; the reflex intentionally omits temporal reasoning.
-- No real refund, replacement, order mutation, carrier contact, or customer communication occurs. Plans and action labels are recommendations only.
-- Single captured A-D completions do not measure robustness, broad accuracy, safety, or repeatability. Model-tag contents, runtime versions, hardware, and contention can change results.
-- The earlier live batch was partial; it has been superseded by a completed A-D batch and separate real A-D UI evidence. Neither establishes complete mobile usability. Fresh-venv installation/tests were verified on the same machine; Windows and fresh-machine setup were not verified.
+- Authored structured claims drive classical reasoning; raw customer text does not imply general NLP parsing.
+- Policies, utility features, and learning seeds are synthetic, not empirical commerce policy or calibrated probabilities. Fixed-context learning does not generalize; public holidays are not modeled.
+- Citation validity and action/policy checks are not full semantic entailment; C is the concrete counterexample described above.
+- Shared frozen cases provide common evidence, not identical processing. Learning also consumes disclosed history; the reflex deliberately omits temporal reasoning and misses B.
+- Learning persistence is a single-user file, not atomic or concurrency-safe storage. Feedback is explicit and simulated, not assessed real customer outcomes.
+- No real refund, replacement, order mutation, carrier contact, or customer communication occurs. Plan effects and action labels are recommendations only. Public traces contain rationale and tool/validation evidence, not private reasoning.
+- Captured A-D completions do not establish broad accuracy, robustness, safety, or repeatability. Model contents, runtime versions, hardware, and load can change results. Windows, fresh-machine setup, and exhaustive mobile usability remain unverified.
+
+## Historical Verification (Superseded)
+
+The following records preserve development history from **2026-11-14**, not final-result claims. All A-D fixtures evaluate simulated records as of **2026-11-13**. Historical installation/live logs replace personal filesystem paths with `<project-directory>` without changing recorded results or timings.
+
+### Earlier Offline Verification
+
+- [Original offline log](offline-test-results.txt): **270 passed, 4 deselected in 2.35s**, with no expected failures.
+- [Fresh installation](fresh-install.txt) and [fresh-venv test log](fresh-test-results.txt): pinned dependencies installed in Python 3.13.5 `.venv-verify` without system site packages; **270 passed, 4 deselected in 13.50s**, on the same macOS machine.
+- [Earlier final offline log](final-offline-test-results.txt): **274 passed, 4 deselected in 3.53s**. Covers feedback/reset, mechanism/weight-sensitivity UI, policy compatibility, and citation relevance regressions. Two initial fake answers cited unrelated order status for refund/tracking; their test inputs were corrected rather than weakening checks.
+- [Earlier offline log](submission-offline-test-results.txt): **274 passed, 4 deselected in 2.57s**.
+
+The 275-test result at the top supersedes these counts. Tests cover contracts/isolation, shared-case tool parity, policy/date boundaries, missing/conflicting/history evidence, belief replay, BFS paths, utility sensitivity, learning persistence/ranking, tool/output failures, bounded repair, unavailable Ollama, session invalidation, and feedback. Substitute clients test control flow, not real-model reliability.
+
+### Historical Local LLM Runs
+
+These earlier measurements used original `qwen3:4b`. Their similarly named JSON files were subsequently replaced by the final runs linked at the top; current JSON does not substantiate these older timestamps or latencies.
+
+| Historical case | Captured At (UTC, 2026-11-14) | Raw action | Status | Latency (s) | Fixture match |
+|---|---|---|---|---:|---|
+| A | 13:39:32.393595 | `delivery_investigation` | `ok` | 203.345 | Yes |
+| B | 13:41:57.272488 | `payments_escalation` | `ok` | 144.875 | Yes |
+| C | 13:45:19.173158 | `explain_refund_pending` | **`warning`** | 201.897 | **No** |
+| D | 13:47:20.502098 | `share_tracking` | `ok` | 58.074 | Yes |
+
+Each completed case called `lookup_case_records` and `lookup_support_policy` for its selected ID, returned evidence through tool messages, and recorded complete retrieval, two rounds, zero repairs, and citations spanning both tools. Earlier citation/support observations were:
+
+| Case | Cited records | Policy | Interpretation |
+|---|---|---|---|
+| A | `order_status` | `DNR` | Supported; the citation alone is narrower than all investigation prerequisites |
+| B | `refund_status`, `inspection_date` | `REFUND` | Supported escalation; rationale states the Nov 6 deadline |
+| C | `refund_status` | `REFUND` | Unsupported; public rationale was `Refund status unknown; inspection pending verification`, but raw action remained pending explanation |
+| D | `tracking` | `TRACK` | Supported sharing of recorded tracking |
+
+### Live Log Boundary
+
+[live-test-results.txt](live-test-results.txt) records the earlier partial sequential batch: A-C passed, then the harness stopped at D's heading after **600 seconds**. This is not evidence of a D assertion failure. [D's separate rerun](live-D-test-results.txt) records **1 passed in 58.46s**. These are not one uninterrupted four-case pass; the final completed batch supersedes them. The integration-versus-correctness distinction is explained in [Real LLM Evaluation](#real-llm-evaluation).
+
+### Runtime And Thinking Diagnosis
+
+[ollama-diagnosis.md](ollama-diagnosis.md) records original-tag thinking-only metadata (`general.finetune=Thinking`). A `think=false` short probe returned reasoning prose and hit its length limit despite HTTP 200; a `reasoning=False` tools probe timed out, which alone does not establish eventual tool behavior. The custom tag's edited Go template was not selected; no custom model/template was needed for the demonstrated original-tag path. External runtime-log line references are historical observations; the full server log is not bundled.
+
+The diagnostic used `reasoning=None`, 1800 tokens, context 4096, and timeout 100 with `trust_env=False`. Its [successful two-tool probe](diagnostic-qwen3-4b-none-tools-1800-1794663110942812000.json) has smaller settings and schema than the final adapter. Other `diagnostic-*.json` files remain available as early probes, not final evaluation evidence.
+
+The [initial smoke result](smoke_qwen3-4b.json) used a smaller contract. Private reasoning was removed, but its wrong public recommendation (no refund instead of investigation) remains. Neither the smoke result nor diagnostic probes supersede final A-D evidence.

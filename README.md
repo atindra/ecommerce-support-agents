@@ -14,11 +14,20 @@ Project: **E-commerce Order and Refund Support Assistant**
 
 Contents: [Results](#recorded-results) | [Setup](#setup) | [Run](#run-and-verify) | [Architecture](#architecture-and-reading-order) | [Mechanisms](#five-mechanisms) | [Cases/policies](#cases-and-ordered-policies) | [Learning](#learning-example) | [LLM checks](#llm-output-and-limits) | [Rubric](#rubric-checklist)
 
+## How To Evaluate This Project
+
+1. **Run the UI:** follow [Setup](#setup), then `python -m streamlit run app.py`. The [run guide](#run-and-verify) covers offline and real-model comparisons.
+2. **Compare A-D:** use the scenario selector and expand agent details; the [six-agent results](#six-agent-results) explain agreement and differences, including the reflex's B warning and the LLM's C failure.
+3. **Inspect the classical agents:** follow [Five Mechanisms](#five-mechanisms) for links to each implementation, or the [source reading order](#architecture-and-reading-order) for shared contracts and validation.
+4. **Check real tool use:** inspect [the LLM adapter](agents/llm.py), its [evidence checks](#llm-output-and-limits), and the [final A-D tool traces](evidence/RESULTS.md#current-results-2026-11-14).
+5. **Demonstrate learning:** follow the [two-failure example](#learning-example), then restart the app to confirm feedback persists. Screenshots and matching downloads are linked there.
+6. **Review verification:** use the [current evidence index](evidence/RESULTS.md#current-results-2026-11-14), [known limitations](#limitations), and [20-mark rubric checklist](#rubric-checklist). Historical diagnostics are labeled separately in RESULTS.
+
 ## Recorded Results
 
 - Latest offline suite: **275 passed, 4 deselected in 2.45s**, using Python 3.13.5 on the same macOS machine ([log](evidence/verification-offline-test-results.txt)).
 - Final real `qwen3:4b` A-D batch: **4 integration tests passed in 243.14s**, with both tools called in every case. A/B/D match targets; **C is wrong**, retaining `explain_refund_pending` with `warning`. This is **3/4 fixture agreement, not accuracy**.
-- Separate real Streamlit captures cover A-D. B/C/D produced escalation (`ok`, 58.949s), pending refund (**`warning`, 33.150s**), and tracking (`ok`, 25.926s). Outcomes agree with the pytest batch, but these are distinct UI runs, not another live pytest batch.
+- Separate real Streamlit captures cover A-D and agree with the batch outcomes, including C's warning; [screenshots, exports, and timings](evidence/RESULTS.md#current-results-2026-11-14) document these distinct UI runs, not another live pytest batch.
 - Desktop A-D offline screenshots, expanded mechanism details, and a 390px mobile offline comparison demonstrate the UI. Wide comparison tables scroll horizontally on mobile; this is not exhaustive mobile or Windows testing.
 
 See [results and evidence](evidence/RESULTS.md) for artifacts, timings, validation details, and limitations.
@@ -57,7 +66,7 @@ ollama list
 ollama --version
 ```
 
-Tested: macOS, Apple M1 Max, 32 GB RAM, Python **3.13.5**, Ollama **0.40.16**, original **`qwen3:4b`** tag (Qwen3 4B Thinking 2507). Dependencies are pinned in `requirements.txt`; alternate model tags need separate validation. See the [runtime diagnosis](evidence/ollama-diagnosis.md) and [full adapter settings](evidence/RESULTS.md#runtime-and-thinking-diagnosis).
+Tested: macOS, Apple M1 Max, 32 GB RAM, Python **3.13.5**, Ollama **0.40.16**, original **`qwen3:4b`** tag (Qwen3 4B Thinking 2507). Dependencies are pinned in `requirements.txt`; alternate model tags need separate validation. See the [runtime diagnosis](evidence/ollama-diagnosis.md) and [full adapter settings](evidence/RESULTS.md#runtime-settings).
 
 ## Run And Verify
 
@@ -90,22 +99,22 @@ Allow more than 600 seconds for a batch under contention, or replace `C` with A/
 
 | Read | File | Purpose |
 |---|---|---|
-| 1 | `contracts.py` | Frozen case, action/result types, typed final answer and citations |
-| 2 | `fixtures.json`, `cases.py` | Synthetic A-D records and case loading |
-| 3 | `domain.py` | Derived facts, ordered eligibility constraints, raw-result validation |
-| 4 | `agents/` | Five independent selectors and the local LLM adapter |
-| 5 | `run_classical.py`, `app.py` | Seeded comparison and interactive UI/feedback |
-| 6 | `tests/`, `evidence/RESULTS.md` | Contract tests, saved results, and measurement limits |
+| 1 | [contracts.py](contracts.py) | Frozen case, action/result types, typed final answer, citations, and fixture loader |
+| 2 | [fixtures.json](fixtures.json) | Synthetic A-D records |
+| 3 | [domain.py](domain.py) | Derived facts, ordered eligibility constraints, raw-result validation |
+| 4 | [agents/](agents/) | Five independent selectors and the local LLM adapter |
+| 5 | [run_classical.py](run_classical.py), [app.py](app.py) | Seeded comparison and interactive UI/feedback |
+| 6 | [tests/](tests/), [RESULTS.md](evidence/RESULTS.md) | Contract tests, saved results, and measurement limits |
 
 All agents receive the same immutable case snapshot; LLM tools close over that selected case rather than reload a global store. Learning additionally receives a copied history snapshot. Shared eligibility supplies constraints, not a central answer selector. Results remain in session state, not a persistent result cache; case/model/LLM-toggle/count changes invalidate them, and feedback/reset clears them.
 
 ## Five Mechanisms
 
-1. **Simple Reflex** (`agents/simple_reflex.py`): first matching current-field rule; no history, search, or age/SLA calculation. It selects pending on B, which validation retains as an ineligible warning.
-2. **Model-Based Reflex** (`agents/model_based.py`): rebuilds beliefs from dated observations, records transitions/conflicts, then reconciles the current snapshot before applying rules. State is local to each invocation.
-3. **Goal-Based** (`agents/goal_based.py`): breadth-first search over facts, recommendations, and paths using explicit preconditions/effects. Intent sets the goal; unreachable goals trigger clarification/review search. Plan effects are hypothetical workflow steps, not observed commerce facts.
-4. **Utility-Based** (`agents/utility_based.py`): filters by eligibility, then maximizes `0.40*impact - 0.25*delay - 0.10*effort - 0.25*error_risk`. Features/weights are synthetic teaching assumptions; traces show contributions, exclusions, and ranking. Weight overrides can change eligible tradeoffs.
-5. **Learning** (`agents/learning.py`): fixed context classifier and persistent outcome counts rank eligible actions by `(success+1)/(success+failure+2)` at full precision. Hard constraints override rates; deterministic ties and unknown-context review keep behavior bounded. This is not general language learning.
+1. **Simple Reflex** ([source](agents/simple_reflex.py)): first matching current-field rule; no history, search, or age/SLA calculation. It selects pending on B, which validation retains as an ineligible warning.
+2. **Model-Based Reflex** ([source](agents/model_based.py)): rebuilds beliefs from dated observations, records transitions/conflicts, then reconciles the current snapshot before applying rules. State is local to each invocation.
+3. **Goal-Based** ([source](agents/goal_based.py)): breadth-first search over facts, recommendations, and paths using explicit preconditions/effects. Intent sets the goal; unreachable goals trigger clarification/review search. Plan effects are hypothetical workflow steps, not observed commerce facts.
+4. **Utility-Based** ([source](agents/utility_based.py)): filters by eligibility, then maximizes `0.40*impact - 0.25*delay - 0.10*effort - 0.25*error_risk`. Features/weights are synthetic teaching assumptions; traces show contributions, exclusions, and ranking. Weight overrides can change eligible tradeoffs.
+5. **Learning** ([source](agents/learning.py)): fixed context classifier and persistent outcome counts rank eligible actions by `(success+1)/(success+failure+2)` at full precision. Hard constraints override rates; deterministic ties and unknown-context review keep behavior bounded. This is not general language learning.
 
 ## Cases And Ordered Policies
 
@@ -192,12 +201,12 @@ C cites an existing `refund_status` whose value is `unknown`; its wrong action r
 
 | Rubric | Implementation / demonstration |
 |---|---|
-| Five classical agents (5) | Separate rule matching, belief replay, BFS, weighted utility, and outcome-count selectors; behavioral tests and expanded UI traces |
-| LLM/tools (4) | Local LangChain/Ollama, two actual case-bound tool calls, typed citations, independent support checks; saved A-D pytest traces and separate live A-D UI exports |
-| Shared scenarios/testing (3) | Frozen A-D fixtures, common snapshots, failure/ambiguity and policy boundary tests |
-| Streamlit/comparison (3) | Six rows, reasons, explicit mechanism explanations, inspectable tools, download, desktop/mobile captures |
-| Learning/evaluation (3) | Persistent explicit feedback, tested and browser-captured two-failure decision switch, hard eligibility for utility/learning, honest C failure |
-| Documentation (2) | Setup, pinned requirements, tests/logs, screenshots, comparison and limitations |
+| Five classical agents (5) | [Five mechanisms and source](#five-mechanisms): separate rule matching, belief replay, BFS, weighted utility, and outcome-count selectors; [behavioral tests](tests/test_agents.py) and expanded UI traces |
+| LLM/tools (4) | [Adapter](agents/llm.py) and [checks](#llm-output-and-limits): local LangChain/Ollama, two actual case-bound tools, typed citations, independent support checks; [saved A-D traces and live UI exports](evidence/RESULTS.md#current-results-2026-11-14) |
+| Shared scenarios/testing (3) | [Frozen A-D fixtures](fixtures.json), common snapshots, failure/ambiguity and [policy boundary tests](tests/test_domain.py) |
+| Streamlit/comparison (3) | [app.py](app.py): six rows, reasons, mechanism explanations, inspectable tools, download; [screenshots](evidence/RESULTS.md#current-results-2026-11-14) |
+| Learning/evaluation (3) | [Persistent feedback demonstration](#learning-example), tested and browser-captured decision switch, hard eligibility for utility/learning, [honest C failure](#limitations) |
+| Documentation (2) | [Setup](#setup), [pinned requirements](requirements.txt), [results/screenshots](evidence/RESULTS.md#current-results-2026-11-14), [comparison](#six-agent-results), and [limitations](#limitations) |
 
 ## Limitations
 
