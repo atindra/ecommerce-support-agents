@@ -14,6 +14,7 @@ This section supersedes the historical measurements below wherever they differ. 
 | Learning | Browser-captured initial / first failure / second failure switch; reload/reset also tested | `learning_A_stage_{0,1,2}.{png,jsonl}`; LLM disabled and original absent runtime state restored |
 
 - [Earlier final offline log](final-offline-test-results.txt): **274 passed, 4 deselected in 3.53s**. Includes immediate feedback display/reset, mechanism explanation/weight-sensitivity UI, action-policy compatibility, uncited declared policy, and irrelevant-record regression checks. An initial run exposed two fake answers citing unrelated `order_status` for refund/tracking; those test inputs now cite relevant facts rather than weakening the checks.
+- [Earlier documentation-check log](submission-offline-test-results.txt): **274 passed, 4 deselected in 2.57s**, the offline suite re-run after the six-agent README summary was added. Superseded by the 275-test result above.
 - [Final live batch log](final-live-test-results.txt): **4 passed, 64 deselected in 243.14s**, one completed sequential A-D run using original `qwen3:4b` and the existing shared service without restarting/reconfiguring it.
 
 | Case | Raw action | Status | Latency seconds | Support/fixture |
