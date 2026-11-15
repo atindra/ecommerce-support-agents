@@ -160,7 +160,7 @@ Saved results from November 14 are indexed in [evidence/RESULTS.md](evidence/RES
 
 - Offline tests: **275 passed, 4 deselected in 2.45s**. A fresh environment from the recorded package also passed 275 tests on the same machine.
 - Real Ollama batch: **4 integration tests passed in 243.14s**. Both tools ran in every case.
-- Separate real Streamlit runs: A-D screenshots and six-agent downloads. Offline screenshots include desktop comparisons, expanded mechanisms, and a 390px mobile view.
+- Separate real Streamlit runs: A-D screenshots and six-agent downloads. Offline screenshots show desktop comparisons and expanded mechanisms.
 - Learning: three screenshots and matching downloads show the two-failure decision change. Persistence and reset are also tested.
 
 ## Rubric Checklist

@@ -12,7 +12,7 @@ This page points to the saved final results. Start with the test logs, one live 
 | Classical comparison                    | 20 results using starting learning counts            | [Decisions and traces](classical-results.jsonl)      |
 | Learning feedback                       | Two failures changed A from investigation to review  | [Screenshots and exports](#learning-demonstration)   |
 
-These are recorded runs, not new tests of the documentation edits. Older results below are for reference only.
+These are recorded runs, not new tests of the documentation edits.
 
 ## Classical A-D Comparison
 
@@ -60,7 +60,7 @@ The saved sequence used actual feedback buttons with a new comparison between cl
 
 Offline desktop comparisons are saved for [A](scenario_A_offline.png), [B](scenario_B_offline.png), [C](scenario_C_offline.png), and [D](scenario_D_offline.png). The LLM row is `not_run` in these images.
 
-[Expanded mechanisms](mechanisms_A_offline.png) show utility and learning details. [Mobile A](scenario_A_mobile_offline.png) shows a comparison at 390x844 with horizontal scrolling for wide tables. This is a limited mobile check, not exhaustive usability testing.
+[Expanded mechanisms](mechanisms_A_offline.png) show utility scoring details. The learning screenshots above show feedback counts and the change in recommendation.
 
 Screenshots can be recreated using [capture_screenshots.py](../capture_screenshots.py). Run `python capture_screenshots.py --help` for instructions. Playwright and Chrome are required.
 
@@ -77,12 +77,3 @@ The [adapter](../agents/llm.py) and final traces record the settings: localhost 
 ## Limitations
 
 The [README limitations](../README.md#limitations) cover scope, learning storage, and variation in model results. B's Simple Reflex warning and C's LLM warning are preserved above. Tool use and citation checks are separate from policy support. They do not prove every explanation claim. No real order changes or refunds occurred.
-
-## Older Results
-
-These earlier setup and model checks are optional reading. They are not needed for the final comparison.
-
-- [Earlier dependency installation](fresh-install.txt) records the packages installed during development.
-- Earlier model checks: [Ollama notes](ollama-diagnosis.md), [two-tool probe](diagnostic-qwen3-4b-none-tools-1800-1794663110942812000.json), and [smoke result](smoke_qwen3-4b.json). These used different settings or answer formats. The smoke result includes an incorrect recommendation.
-
-Final A-D JSON files support the final batch, not older measurements.
